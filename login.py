@@ -1,15 +1,17 @@
 import random
 import time
 
+from restruct_taobao import ACCOUNT,PASSWORD
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
-ACCOUNT = ""
-PASSWORD = ""
+
 LOGIN_URL = "https://login.taobao.com/"
 
 
 class Login(object):
+    
     def __init__(self):
         self.driver = self.ChromeDriverBrowser()
         self.rest = random.randint(2, 5)
