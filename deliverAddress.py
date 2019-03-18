@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 from lxml import etree
 
-from restruct_taobao.login import Login
+from taobaoSpider.login import Login
 
 
 class DeliverAddress(Login):
