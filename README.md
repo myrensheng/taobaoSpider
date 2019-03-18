@@ -7,9 +7,55 @@
 
 使用mitmproxy作为代理服务器，修改一些配置，使淘宝的服务器检测不到selenium。从而达到破解验证码的效果。在terminal中使用mitmweb -s mitmproxy_.py 命令启动文件。
 
-### 2、userinfos.py
+### 2、login.py
 
+**功能**：破解淘宝登录界面，输入账号和密码即可登录。
 
+**难点**：有的时候输入账号和密码后，可能还在登录界面还需要在输入一次密码。使用try except finally解决。
+
+parse_html 解析网页的源码，主要是在子类中实现该功能。
+
+### 3、userinfos.py
+
+**功能**：获取用户的基本信息。
+
+| userinfos中的keys |      解释      | 示例 |
+| :---------------: | :------------: | :--: |
+|       nick        | 用户的淘宝昵称 |      |
+|       email       |   绑定的邮箱   |      |
+|   phone_number    |  绑定的手机号  |      |
+|     real_name     |    真实姓名    |      |
+|        sex        |      性别      |      |
+|       birth       |    出生日期    |      |
+
+**难点**：用户的性别比较难判断。需要判断性别中的check属性是否存在。使用xpath选择属性。判断规则为：if checked = “”
+
+### 4、deliverAddress.py
+
+功能：获取用户的收货地址。
+
+用户的地址可能有多个。deliverAddress={"0":{},"1":{},...}，deliveraddress的values是一个字典。
+
+| 字典中的keys |    解释    | 示例 |
+| :----------: | :--------: | :--: |
+|   default    | 是否是默认 |      |
+|     name     |    姓名    |      |
+|   province   |    省份    |      |
+|     city     |    城市    |      |
+|   address    |    地区    |      |
+| full_address |  详细地址  |      |
+|   zip_code   |    邮编    |      |
+|   phone_no   |    电话    |      |
+
+难点：
+
+1、地址的切分
+
+2、是否是默认地址的判断
+
+### 5、tradedetail.py
+
+功能：获取用户的交易信息
 
 
 
