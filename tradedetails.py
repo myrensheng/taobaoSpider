@@ -1,4 +1,6 @@
 import datetime
+import time
+
 from dateutil.parser import parse
 
 from bs4 import BeautifulSoup
@@ -13,21 +15,40 @@ class TradeDetails(Login):
 
     def parse_html(self):
         # 点击已买到的宝贝
+        self.driver.implicitly_wait(10)
         self.driver.find_element_by_xpath('//*[@id="bought"]').click()
+        shop_num = 0
         trade_html = self.driver.page_source
-        self.parse_trade(trade_html)
+        result = self.parse_trade(trade_html,shop_num)
+        if not result:  # 第一页数据获取完成，继续点击下一页
+            while True:
+                time.sleep(self.rest)
+                shop_num += 15
+                try:
+                    # 如果点击到最后一页，交易信息在6个月内会报错
+                    self.driver.implicitly_wait(10)
+                    nextBtn = self.driver.find_element_by_xpath('//*[@id="tp-bought-root"]/div[3]/div[2]/div/button[2]')
+                    self.driver.execute_script("arguments[0].scrollIntoView()",nextBtn)
+                    nextBtn.click()
+                    time.sleep(self.rest)
+                    self.driver.implicitly_wait(10)
+                    trade_html = self.driver.page_source
+                    result = self.parse_trade(trade_html,shop_num)
+                except Exception as e:
+                    break
+                if result:  # 解析结果为false跳出循环
+                    break
 
-    def parse_trade(self, trade_html):
+    def parse_trade(self, trade_html,shop_num):
         """
         解析交易信息
+        :param trade_html网页源码；shop_num 自定义的商品编号。
+        :return True表示获取已完成，结束下一页点击操作；False表示获取未完成，继续点击下一页
         """
-        html = etree.HTML(trade_html)
-
         # 找出每一页中的交易商品数量
         soup = BeautifulSoup(trade_html, 'lxml')
         class_attr = 'bought-table-mod__table___3u4gN bought-wrapper-mod__table___3xFFM'
         tables = soup.find_all("table", class_=class_attr)  # 所有交易的信息
-        # length = len(tables)  # 长度为每一页的交易数量
         for table in tables:
             tradedetails = {}
             html = etree.HTML(str(table))
@@ -37,11 +58,13 @@ class TradeDetails(Login):
                 tradedetails['trade_id'] = html.xpath('*//tbody[1]/tr/td[1]/span/span[3]/text()')[0]
                 tradedetails['seller_shopname'] = html.xpath('*//tbody[1]/tr/td[2]/span/a/text()')[0]
                 actual_fee = html.xpath('*//tbody[2]/tr[1]/td[5]/div/div[1]/p/strong/span[2]/text()')[0]
-                tradedetails['actual_fee'] = float(actual_fee) * 100
+                tradedetails['actual_fee'] = round(float(actual_fee) * 100,1)  # 交易金额按照“分”计算
                 tradedetails['trade_status'] = html.xpath('*//tbody[2]/tr[1]/td[6]/div/p/span/text()')[0]
-                self.tradedetails[str(tables.index(table))] = tradedetails
+                self.tradedetails[str(shop_num+tables.index(table))] = tradedetails
             else:
-                break
+                # 表示交易时间以超过6个月，任务已完成。
+                return True
+        return False
 
     def judge_time(self,trade_createtime):
         """
