@@ -47,7 +47,7 @@ parse_html 解析网页的源码，主要是在子类中实现该功能。
 |   zip_code   |    邮编    |      |
 |   phone_no   |    电话    |      |
 
-难点：
+**难点**：
 
 1、地址的切分
 
@@ -55,7 +55,28 @@ parse_html 解析网页的源码，主要是在子类中实现该功能。
 
 ### 5、tradedetail.py
 
-功能：获取用户的交易信息
+**功能**：获取用户最近6个月的交易信息
 
+tradedetails = {"0":{},"1":{},,,}，tradedetails中的每一个value也是一个字典。
 
+|   字典中的keys   |   解释   | 示例 |
+| :--------------: | :------: | :--: |
+| trade_createtime | 交易时间 |      |
+|     trade_id     | 订单编号 |      |
+| seller_shopname  | 商品名称 |      |
+|    actual_fee    | 商品价格 |      |
+|   trade_status   | 交易状态 |      |
 
+**难点**：
+
+1、点击下一页的按钮，直接获取会报错，not clicked...  。需要使用下面代码实现点击下一页。
+
+```python
+nextBtn = self.driver.find_element_by_xpath('//*[@id="tp-bought-root"]/div[3]/div[2]/div/button[2]')
+self.driver.execute_script("arguments[0].scrollIntoView()",nextBtn)
+nextBtn.click()
+```
+
+2、隐形等待时间和自定义休息时间加上，不然可能会出现重复获取的情况。
+
+3、时间的判断使用dateutil.parser工具。
