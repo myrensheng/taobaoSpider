@@ -59,13 +59,20 @@ parse_html 解析网页的源码，主要是在子类中实现该功能。
 
 tradedetails = {"0":{},"1":{},,,}，tradedetails中的每一个value也是一个字典。
 
-|   字典中的keys   |   解释   | 示例 |
-| :--------------: | :------: | :--: |
-| trade_createtime | 交易时间 |      |
-|     trade_id     | 订单编号 |      |
-| seller_shopname  | 商品名称 |      |
-|    actual_fee    | 商品价格 |      |
-|   trade_status   | 交易状态 |      |
+|   字典中的keys   |     解释     | 示例 |
+| :--------------: | :----------: | :--: |
+| trade_createtime |   交易时间   |      |
+|     trade_id     |   订单编号   |      |
+| seller_shopname  |   商家名称   |      |
+|     quantity     |   商品数量   |      |
+|   trade_status   |   交易状态   |      |
+|     item_url     |   商品地址   |      |
+|     item_id      |    商品id    |      |
+|     item_pic     | 商品图片地址 |      |
+|    item_name     |   商品名称   |      |
+|     original     |   商品原价   |      |
+|    actual_fee    |   实际价格   |      |
+|    trade_text    | 交易中文状态 |      |
 
 **难点**：
 
@@ -80,3 +87,5 @@ nextBtn.click()
 2、隐形等待时间和自定义休息时间加上，不然可能会出现重复获取的情况。
 
 3、时间的判断使用dateutil.parser工具。
+
+4、点击到订单详情页面后，获取详细的交易信息。？？？尚未解决。
