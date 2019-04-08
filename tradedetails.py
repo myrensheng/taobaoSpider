@@ -43,7 +43,8 @@ class TradeDetails(Login):
     def parse_trade(self, trade_html, shop_num):
         """
         解析交易信息
-        :param trade_html网页源码；shop_num 自定义的商品编号。
+        :param trade_html 网页源码；
+        :param shop_num 自定义的商品编号。
         :return True表示获取已完成，结束下一页点击操作；False表示获取未完成，继续点击下一页
         """
         # 找出每一页中的交易商品数量
@@ -73,11 +74,33 @@ class TradeDetails(Login):
                     tradedetails['original'] = actual_fee
                 tradedetails['actual_fee'] = actual_fee
                 tradedetails['quantity'] = html.xpath('*//tbody[2]/tr/td[3]/div/p/text()')[0]
-                tradedetails['trade_status'] = html.xpath('*//tbody[2]/tr[1]/td[6]/div/p/span/text()')[0]
+                trade_status_dict = {'等待买家付款': 'WAIT_BUYER_PAY',
+                                     '等待卖家发货': 'WAIT_SELLER_SEND_GOODS',
+                                     '卖家部分发货': 'SELLER_CONSIGNED_PART',
+                                     '等待买家确认收货': 'WAIT_BUYER_CONFIRM_GOODS',
+                                     '交易成功': 'TRADE_FINISHED',
+                                     '充值成功': 'TRADE_FINISHED',
+                                     '交易关闭': 'TRADE_CLOSED',
+                                     '交易被淘宝关闭': 'TRADE_CLOSE_BY_TAOBAO',
+                                     '没有创建外部交易（支付宝交易）': 'TRADE_NO_CREATE_PAY',
+                                     '外卡支付付款确认中': 'PAY_PENDING',
+                                     }
+                trade_text = html.xpath('*//tbody[2]/tr[1]/td[6]/div/p/span/text()')[0]
+                tradedetails['trade_text'] = trade_text
+                tradedetails['trade_status'] = trade_status_dict.get(trade_text, "ERROR")
                 self.tradedetails[str(shop_num + tables.index(table))] = tradedetails
+
                 # 点击进入订单详情页面
-                # self.driver.find_element_by_xpath('//*[@id="viewDetail"]/@href').click()
-                # 解析订单详情页面的信息
+                # try:
+                #     self.driver.find_element_by_xpath('//*[@id="viewDetail"]').click()
+                #     self.driver.implicitly_wait(10)
+                #     order_detail_html = self.driver.page_source
+                #     infos = self.parse_order_detail(order_detail_html)
+                #     # self.driver.close()
+                #     # print(infos)
+                # except Exception as e:
+                #     print(e)
+                # # 解析订单详情页面的信息
 
             else:
                 # 表示交易时间已超过6个月，任务已完成。
@@ -96,6 +119,15 @@ class TradeDetails(Login):
         else:
             return False
 
+    # def parse_order_detail(self, order_detail_html):
+    #     # //*[@id="J_trade_imfor"]/div/ul/li[1]/div[2]/span/text()
+    #     html = etree.HTML(order_detail_html)
+    #     try:
+    #         infos = html.xpath('//*[@id="J_trade_imfor"]/div/ul/li[1]/div[2]/span/text()')[0]
+    #     except Exception as e:
+    #         print(e)
+    #         infos = None
+    #     return infos
 
 if __name__ == '__main__':
     trade = TradeDetails()
