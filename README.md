@@ -90,7 +90,7 @@ nextBtn.click()
 
 4、点击到订单详情页面后，获取详细的交易信息。有解决的办法：
 
-将每个商品的href放到字典order_href中，key与tradedetail中的key对应。使用parse_order_detail方法得到每一个网页源码，通过parse_order解析源码。
+将每个商品的href放到字典order_href中，key与tradedetail中的key对应。order_href是每一个订单的详情页面地址，使用driver.get()访问每个不同的页面，判断地址的开头，使用不同的解析方法将解析的字段放到对应的字典中（方法parse_order_detail）。最后通过key拼接字典。
 
 ### 6、parse_order.py
 
