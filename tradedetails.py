@@ -7,11 +7,15 @@ from bs4 import BeautifulSoup
 from lxml import etree
 
 from restruct_taobao.login import Login
+from restruct_taobao.parse_order import *
+
 
 
 class TradeDetails(Login):
     now_time = datetime.datetime.now()
     tradedetails = {}
+    order_href = {}
+    order_detail = {}
 
     def parse_html(self):
         # 点击已买到的宝贝
@@ -39,6 +43,10 @@ class TradeDetails(Login):
                     break
                 if result:  # 解析结果为false跳出循环
                     break
+        # -----------------------------------
+        # 获取订单详情页的数据
+        self.parse_order_detail()
+
 
     def parse_trade(self, trade_html, shop_num):
         """
@@ -89,19 +97,9 @@ class TradeDetails(Login):
                 tradedetails['trade_text'] = trade_text
                 tradedetails['trade_status'] = trade_status_dict.get(trade_text, "ERROR")
                 self.tradedetails[str(shop_num + tables.index(table))] = tradedetails
-
-                # 点击进入订单详情页面
-                # try:
-                #     self.driver.find_element_by_xpath('//*[@id="viewDetail"]').click()
-                #     self.driver.implicitly_wait(10)
-                #     order_detail_html = self.driver.page_source
-                #     infos = self.parse_order_detail(order_detail_html)
-                #     # self.driver.close()
-                #     # print(infos)
-                # except Exception as e:
-                #     print(e)
-                # # 解析订单详情页面的信息
-
+                order_url = "https:"+html.xpath('//*[@id="viewDetail"]/@href')[0]
+                self.order_href[str(shop_num + tables.index(table))] = order_url
+                # self.driver.get(order_url)
             else:
                 # 表示交易时间已超过6个月，任务已完成。
                 return True
@@ -119,16 +117,45 @@ class TradeDetails(Login):
         else:
             return False
 
-    # def parse_order_detail(self, order_detail_html):
-    #     # //*[@id="J_trade_imfor"]/div/ul/li[1]/div[2]/span/text()
-    #     html = etree.HTML(order_detail_html)
-    #     try:
-    #         infos = html.xpath('//*[@id="J_trade_imfor"]/div/ul/li[1]/div[2]/span/text()')[0]
-    #     except Exception as e:
-    #         print(e)
-    #         infos = None
-    #     return infos
+    def parse_order_detail(self):
+        """
+        解析订单详情页面
+        """
+        # 根据得到的href，判断需要使用哪个函数解析页面
+        parse_method = {
+            '//buyertrade': parse_buytertrade,
+            '//trade': parse_tradetmall,
+            '//train': parse_traintrip,
+            '//tradearchive': parse_tradearchive,
+            '//diannying': parse_dianying,
+        }
+        # 循环遍历href，解析到对应的字段
+        for k,v in self.order_href.items():
+            start_with = v.split(':')[-1].split('.')[0]
+            fun = parse_method.get(start_with, False)
+            if fun:  # 有可能没有对应的解析函数
+                self.driver.get(v)
+                time.sleep(self.rest)
+                self.driver.implicitly_wait(10)
+                page_source = self.driver.page_source
+
+                # ----------------------------------------------
+                # result = fun(page_source)
+                # print(v)
+                # print(k, result)
+                # 将得到的字段更新到tradedetails中
+                # self.tradedetails[k].update(result)
+                # ----------------------------------------------
+
+                # 将解析到的字段放到order_detail中
+                self.order_detail[k] = fun(page_source)
+                print(v)
+                print(k,self.order_detail)
+            else:
+                print("没有对应解解析的函数", start_with)
+
 
 if __name__ == '__main__':
     trade = TradeDetails()
     print(trade.tradedetails)
+    # print(trade.order_href)
