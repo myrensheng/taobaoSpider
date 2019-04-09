@@ -3,11 +3,11 @@
 
 主要配置环境在requirements.txt中
 
-### 1、mitmproxy_.py
+### [1、mitmproxy_.py](https://github.com/myrensheng/taobaoSpider/blob/master/mitmproxy_.py)
 
 使用mitmproxy作为代理服务器，修改一些配置，使淘宝的服务器检测不到selenium。从而达到破解验证码的效果。在terminal中使用mitmweb -s mitmproxy_.py 命令启动文件。
 
-### 2、login.py
+### [2、login.py](https://github.com/myrensheng/taobaoSpider/blob/master/login.py)
 
 **功能**：破解淘宝登录界面，输入账号和密码即可登录。
 
@@ -15,7 +15,7 @@
 
 parse_html 解析网页的源码，主要是在子类中实现该功能。
 
-### 3、userinfos.py
+### 3、[userinfos.py](https://github.com/myrensheng/taobaoSpider/blob/master/userinfos.py)
 
 **功能**：获取用户的基本信息。
 
@@ -30,7 +30,7 @@ parse_html 解析网页的源码，主要是在子类中实现该功能。
 
 **难点**：用户的性别比较难判断。需要判断性别中的check属性是否存在。使用xpath选择属性。判断规则为：if checked = “”
 
-### 4、deliverAddress.py
+### 4、[deliverAddress.py](https://github.com/myrensheng/taobaoSpider/blob/master/deliverAddress.py)
 
 功能：获取用户的收货地址。
 
@@ -53,7 +53,7 @@ parse_html 解析网页的源码，主要是在子类中实现该功能。
 
 2、是否是默认地址的判断
 
-### 5、tradedetail.py
+### 5、[tradedetails.py](https://github.com/myrensheng/taobaoSpider/blob/master/tradedetails.py)
 
 **功能**：获取用户最近6个月的交易信息
 
@@ -92,7 +92,7 @@ nextBtn.click()
 
 将每个商品的href放到字典order_href中，key与tradedetail中的key对应。order_href是每一个订单的详情页面地址，使用driver.get()访问每个不同的页面，判断地址的开头，使用不同的解析方法将解析的字段放到对应的字典中（方法parse_order_detail）。最后通过key拼接字典。
 
-### 6、parse_order.py
+### 6、[parse_order.py](https://github.com/myrensheng/taobaoSpider/blob/master/parse_order.py)
 
 订单详情页有许多不同的格式，根据得到的href，使用不同的函数解析page_souce，返回解析后的字段。字典类型。
 
