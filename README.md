@@ -88,4 +88,13 @@ nextBtn.click()
 
 3、时间的判断使用dateutil.parser工具。
 
-4、点击到订单详情页面后，获取详细的交易信息。？？？尚未解决。
+4、点击到订单详情页面后，获取详细的交易信息。有解决的办法：
+
+将每个商品的href放到字典order_href中，key与tradedetail中的key对应。使用parse_order_detail方法得到每一个网页源码，通过parse_order解析源码。
+
+### 6、parse_order.py
+
+订单详情页有许多不同的格式，根据得到的href，使用不同的函数解析page_souce，返回解析后的字段。字典类型。
+
+
+
