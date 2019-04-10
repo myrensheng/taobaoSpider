@@ -10,7 +10,6 @@ from restruct_taobao.login import Login
 from restruct_taobao.parse_order import *
 
 
-
 class TradeDetails(Login):
     now_time = datetime.datetime.now()
     tradedetails = {}
@@ -23,6 +22,7 @@ class TradeDetails(Login):
         self.driver.find_element_by_xpath('//*[@id="bought"]').click()
         shop_num = 0
         trade_html = self.driver.page_source
+        # 获取交易信息
         result = self.parse_trade(trade_html, shop_num)
         if not result:  # 第一页数据获取完成，继续点击下一页
             while True:
@@ -43,10 +43,8 @@ class TradeDetails(Login):
                     break
                 if result:  # 解析结果为false跳出循环
                     break
-        # -----------------------------------
         # 获取订单详情页的数据
         self.parse_order_detail()
-
 
     def parse_trade(self, trade_html, shop_num):
         """
@@ -71,14 +69,17 @@ class TradeDetails(Login):
                 tradedetails['item_url'] = item_url
                 tradedetails['item_id'] = item_url.split('=')[-1]
                 tradedetails['item_pic'] = html.xpath('*//tbody[2]/tr/td[1]/div/div[1]/a/img/@src')[0]
-                tradedetails['item_name'] = html.xpath('*//tbody[2]/tr[1]/td[1]/div/div[2]/p[1]/a[1]/span[2]/text()')[0]
+                item_name_xpath = '*//tbody[2]/tr[1]/td[1]/div/div[2]/p[1]/a[1]/span[2]/text()'
+                tradedetails['item_name'] = html.xpath(item_name_xpath)[0]
                 actual_fee = html.xpath('*//tbody[2]/tr[1]/td[5]/div/div[1]/p/strong/span[2]/text()')[0]
                 actual_fee = round(float(actual_fee) * 100, 1)  # 交易金额按照“分”计算
                 try:
+                    # 商品未打折价格，有就获取，没有就按照原价
                     origin = html.xpath('*//tbody[2]/tr[1]/td[2]/div/p[1]/del/span[2]/text()')[0]
                     origin = round(float(origin) * 100, 1)  # 交易金额按照“分”计算
                     tradedetails['original'] = origin
                 except Exception as e:
+                    # print(e)
                     tradedetails['original'] = actual_fee
                 tradedetails['actual_fee'] = actual_fee
                 tradedetails['quantity'] = html.xpath('*//tbody[2]/tr/td[3]/div/p/text()')[0]
@@ -97,9 +98,8 @@ class TradeDetails(Login):
                 tradedetails['trade_text'] = trade_text
                 tradedetails['trade_status'] = trade_status_dict.get(trade_text, "ERROR")
                 self.tradedetails[str(shop_num + tables.index(table))] = tradedetails
-                order_url = "https:"+html.xpath('//*[@id="viewDetail"]/@href')[0]
+                order_url = "https:" + html.xpath('//*[@id="viewDetail"]/@href')[0]
                 self.order_href[str(shop_num + tables.index(table))] = order_url
-                # self.driver.get(order_url)
             else:
                 # 表示交易时间已超过6个月，任务已完成。
                 return True
@@ -129,8 +129,8 @@ class TradeDetails(Login):
             '//tradearchive': parse_tradearchive,
             '//diannying': parse_dianying,
         }
-        # 循环遍历href，解析到对应的字段
-        for k,v in self.order_href.items():
+        # 循环遍历order_href字典，解析到对应的字段
+        for k, v in self.order_href.items():
             start_with = v.split(':')[-1].split('.')[0]
             fun = parse_method.get(start_with, False)
             if fun:  # 有可能没有对应的解析函数
@@ -140,22 +140,22 @@ class TradeDetails(Login):
                 page_source = self.driver.page_source
 
                 # ----------------------------------------------
-                # result = fun(page_source)
-                # print(v)
-                # print(k, result)
+                result = fun(page_source)
+                print(v)
+                print(k, result)
                 # 将得到的字段更新到tradedetails中
                 # self.tradedetails[k].update(result)
                 # ----------------------------------------------
 
                 # 将解析到的字段放到order_detail中
-                self.order_detail[k] = fun(page_source)
-                print(v)
-                print(k,self.order_detail)
+                # self.order_detail[k] = fun(page_source)
+                # print(v)
+                # print(k, self.order_detail)
             else:
-                print("没有对应解解析的函数", start_with)
+                print("没有对应解析的函数", start_with)
 
 
 if __name__ == '__main__':
     trade = TradeDetails()
-    print(trade.tradedetails)
+    # print(trade.tradedetails)
     # print(trade.order_href)
