@@ -96,5 +96,51 @@ nextBtn.click()
 
 订单详情页有许多不同的格式，根据得到的href，使用不同的函数解析page_souce，返回解析后的字段。字典类型。
 
+#### 6.1 parse_buytertrade函数
+
+**功能**：解析href中以buytertrade开头的订单详情内容。
+
+|     字典中的key     |      解释      | 示例 |
+| :-----------------: | :------------: | :--: |
+|      trade_id       |    订单编号    |      |
+| trade_success_time  |  交易成功时间  |      |
+|    deliver_name     |     收货人     |      |
+| deliver_mobilephone | 收货人手机号码 |      |
+
+**难点**：需要的信息可能放在不同的位置，需要判断。
+
+#### 6.2 parse_tradetmall函数
+
+**功能**：解析href中以trade开头的订单详情内容。
+
+|     字典中的key     |       解释       | 示例 |
+| :-----------------: | :--------------: | :--: |
+|    deliver_name     |    收货人姓名    |      |
+| deliver_mobilephone |  收货人手机号码  |      |
+|      province       | 收货地址中的省份 |      |
+|        city         |       城市       |      |
+|   deliver_address   |     详细地址     |      |
+|  deliver_postcode   |       邮编       |      |
+|      trade_id       |     商品编号     |      |
+
+**难点：**收货地址的切割。
+
+#### 6.3 parse_tradearchive函数
+
+**功能：**解析href以tradearchieve开头的订单详情。
+
+|     子字典中key     |       解释       | 示例 |
+| :-----------------: | :--------------: | :--: |
+|      trade_id       |      商品id      |      |
+| trade_success_time  |   交易成功时间   |      |
+|    deliver_name     |    收货人姓名    |      |
+| deliver_mobilephone |  收货人手机号码  |      |
+|      province       | 收货地址中的省份 |      |
+|        city         |       城市       |      |
+|   deliver_address   |     详细地址     |      |
+|  deliver_postcode   |       邮编       |      |
+
+**难点：**收货地址的切割。
+
 
 
