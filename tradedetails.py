@@ -40,6 +40,7 @@ class TradeDetails(Login):
                     trade_html = self.driver.page_source
                     result = self.parse_trade(trade_html, shop_num)
                 except Exception as e:
+                    print("翻页循环获取交易信息",e)
                     break
                 if result:  # 解析结果为false跳出循环
                     break
@@ -78,8 +79,7 @@ class TradeDetails(Login):
                     origin = html.xpath('*//tbody[2]/tr[1]/td[2]/div/p[1]/del/span[2]/text()')[0]
                     origin = round(float(origin) * 100, 1)  # 交易金额按照“分”计算
                     tradedetails['original'] = origin
-                except Exception as e:
-                    # print(e)
+                except:
                     tradedetails['original'] = actual_fee
                 tradedetails['actual_fee'] = actual_fee
                 tradedetails['quantity'] = html.xpath('*//tbody[2]/tr/td[3]/div/p/text()')[0]
@@ -144,7 +144,7 @@ class TradeDetails(Login):
                 print(v)
                 print(k, result)
                 # 将得到的字段更新到tradedetails中
-                # self.tradedetails[k].update(result)
+                self.tradedetails[k].update(result)
                 # ----------------------------------------------
 
                 # 将解析到的字段放到order_detail中
@@ -157,5 +157,5 @@ class TradeDetails(Login):
 
 if __name__ == '__main__':
     trade = TradeDetails()
-    # print(trade.tradedetails)
+    print(trade.tradedetails)
     # print(trade.order_href)
