@@ -4,7 +4,7 @@ from datetime import datetime
 
 from bs4 import BeautifulSoup
 from dateutil.parser import parse
-from lxml import etree
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
@@ -28,7 +28,8 @@ class User:
         self.rest = random.randint(2, 5)
         self.login()
 
-    def chrome_driver_nobrowser(self):
+    @staticmethod
+    def chrome_driver_no_browser():
         """
         使用无界面的浏览器
         """
@@ -38,7 +39,8 @@ class User:
         driver = webdriver.Chrome(chrome_options=chrome_options)
         return driver
 
-    def chrome_driver_browser(self):
+    @staticmethod
+    def chrome_driver_browser():
         """
         使用有界面的浏览器
         """
@@ -214,10 +216,10 @@ class User:
                 try:
                     # 如果点击到最后一页，交易信息仍在6个月内，会报错
                     self.driver.implicitly_wait(10)
-                    nextBtn_xpath = '//*[@id="tp-bought-root"]/div[3]/div[2]/div/button[2]'
-                    nextBtn = self.driver.find_element_by_xpath(nextBtn_xpath)
-                    self.driver.execute_script("arguments[0].scrollIntoView()", nextBtn)
-                    nextBtn.click()
+                    next_btn_xpath = '//*[@id="tp-bought-root"]/div[3]/div[2]/div/button[2]'
+                    next_btn = self.driver.find_element_by_xpath(next_btn_xpath)
+                    self.driver.execute_script("arguments[0].scrollIntoView()", next_btn)
+                    next_btn.click()
                     time.sleep(self.rest)
                     self.driver.implicitly_wait(10)
                     trade_html = self.driver.page_source
@@ -262,7 +264,7 @@ class User:
                     origin = html.xpath('*//tbody[2]/tr[1]/td[2]/div/p[1]/del/span[2]/text()')[0]
                     origin = round(float(origin) * 100, 1)  # 交易金额按照“分”计算
                     tradedetails['original'] = origin
-                except:
+                except IndexError:
                     tradedetails['original'] = actual_fee
                 tradedetails['actual_fee'] = actual_fee
                 tradedetails['quantity'] = html.xpath('*//tbody[2]/tr/td[3]/div/p/text()')[0]
@@ -346,7 +348,7 @@ class User:
 
 
 if __name__ == '__main__':
-    account = '*********'
-    password = '*********'
-    user = User(account, password)
+    user_account = ''
+    user_password = ''
+    user = User(user_account, user_password)
     print(user.user_all_info)
