@@ -1,3 +1,4 @@
+import pymongo
 import random
 import time
 from datetime import datetime
@@ -12,6 +13,11 @@ from restruct_taobao.parse_order import *
 
 LOGIN_URL = "https://login.taobao.com/"
 # CHROME_DRIVER = ""
+MONGODB_USER = ""
+MONGODB_PASSWORD = ""
+MONGODB_IP = ""
+MONGODB_PORT = ""
+MONGODB_CONN = "mongodb://"+MONGODB_USER+":"+MONGODB_PASSWORD+"@"+MONGODB_IP+":"+MONGODB_PORT+"/"
 
 
 class User:
@@ -111,6 +117,8 @@ class User:
         time.sleep(0.5)
         print("正在整理信息...")
         self.all_info()
+        print("数据保存到mongodb中...")
+        self.save_mongodb()
 
     # 用户的基本信息
     def user_info(self):
@@ -367,9 +375,15 @@ class User:
         self.user_all_info['deliveraddress'] = self.deliveraddress
         self.user_all_info['tradedetails'] = self.tradedetails
 
+    def save_mongodb(self):
+        client = pymongo.MongoClient(MONGODB_CONN)
+        collection = client.TaoBao.users
+        result = collection.insert_one(self.user_all_info)
+        print(result.inserted_id)
+
 
 if __name__ == '__main__':
-    user_account = '18309169600'
-    user_password = 'zsloveyou521'
+    user_account = ''
+    user_password = ''
     user = User(user_account, user_password)
     print(user.user_all_info)
