@@ -60,7 +60,7 @@ six==1.12.0
 sortedcontainers==2.0.5
 tornado==5.1.1
 tqdm==4.28.1
-Twisted==18.9.0
+Twisted==19.7.0
 urllib3==1.24.1
 urwid==2.0.1
 w3lib==1.19.0
